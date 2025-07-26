@@ -42,15 +42,15 @@ export default function HobbiesList() {
   const handleDeleteHobby = async (hobbyId) => {
     if (confirm('Are you sure you want to delete this hobby?')) {
       try {
-        // Note: Delete hobby API might not be implemented in the original API
-        // This is a placeholder for when the API is available
-        console.log('Delete hobby:', hobbyId);
-        // const response = await apiService.hobby.deleteHobby(hobbyId, apiService.getToken());
-        // if (response.success) {
-        //   setHobbies(hobbies.filter(h => h.id !== hobbyId));
-        // }
+        const response = await apiService.hobby.deleteHobby(hobbyId, apiService.getToken());
+        if (response.success) {
+          setHobbies(hobbies.filter(h => h.id !== hobbyId));
+        } else {
+          alert('Failed to delete hobby: ' + (response.message || 'Unknown error'));
+        }
       } catch (error) {
         console.error('Error deleting hobby:', error);
+        alert('Error deleting hobby: ' + error.message);
       }
     }
   };
@@ -59,9 +59,7 @@ export default function HobbiesList() {
     try {
       let response;
       if (editingHobby) {
-        // Note: Update hobby API might not be implemented in the original API
-        console.log('Update hobby:', editingHobby.id, hobbyData);
-        // response = await apiService.hobby.updateHobby(editingHobby.id, hobbyData, apiService.getToken());
+        response = await apiService.hobby.updateHobby(editingHobby.id, hobbyData, apiService.getToken());
       } else {
         response = await apiService.hobby.createHobby(hobbyData, apiService.getToken());
       }
@@ -70,9 +68,12 @@ export default function HobbiesList() {
         await loadHobbies();
         setShowForm(false);
         setEditingHobby(null);
+      } else {
+        alert('Failed to save hobby: ' + (response?.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error saving hobby:', error);
+      alert('Error saving hobby: ' + error.message);
     }
   };
 

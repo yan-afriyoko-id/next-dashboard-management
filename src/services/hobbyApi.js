@@ -27,6 +27,33 @@ class HobbyApiService {
     }
   }
 
+  // Update hobby
+  async updateHobby(hobbyId, hobbyData, token) {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.HOBBY.UPDATE(hobbyId)), {
+        method: 'PUT',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify(hobbyData)
+      });
+      return await response.json();
+    } catch (error) {
+      throw new Error('Failed to update hobby: ' + error.message);
+    }
+  }
+
+  // Delete hobby
+  async deleteHobby(hobbyId, token) {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.HOBBY.DELETE(hobbyId)), {
+        method: 'DELETE',
+        headers: getAuthHeaders(token)
+      });
+      return await response.json();
+    } catch (error) {
+      throw new Error('Failed to delete hobby: ' + error.message);
+    }
+  }
+
   // Helper method to validate hobby data
   validateHobbyData(data) {
     const errors = [];

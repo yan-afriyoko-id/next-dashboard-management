@@ -22,6 +22,7 @@ export default function StudentsList() {
     try {
       setIsLoading(true);
       const response = await apiService.siswa.getAllStudents(apiService.getToken());
+      console.log('Students response:', response); // Debug log
       if (response.success) {
         setStudents(response.data);
       }

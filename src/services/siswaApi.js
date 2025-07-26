@@ -28,10 +28,13 @@ class SiswaApiService {
   // Create new student
   async createStudent(studentData, token) {
     try {
+      // Format data according to API expectations
+      const formattedData = this.formatStudentData(studentData);
+      
       const response = await fetch(getApiUrl(API_CONFIG.SISWA.CREATE), {
         method: 'POST',
         headers: getAuthHeaders(token),
-        body: JSON.stringify(studentData)
+        body: JSON.stringify(formattedData)
       });
       return await response.json();
     } catch (error) {
@@ -42,10 +45,13 @@ class SiswaApiService {
   // Update student
   async updateStudent(id, studentData, token) {
     try {
+      // Format data according to API expectations
+      const formattedData = this.formatStudentData(studentData);
+      
       const response = await fetch(getApiUrl(API_CONFIG.SISWA.UPDATE(id)), {
         method: 'PUT',
         headers: getAuthHeaders(token),
-        body: JSON.stringify(studentData)
+        body: JSON.stringify(formattedData)
       });
       return await response.json();
     } catch (error) {

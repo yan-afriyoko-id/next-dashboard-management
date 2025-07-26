@@ -1,72 +1,69 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { formatPhoneNumber } from '../../utils/apiUtils.js';
+import { useState, useEffect } from "react";
 
 export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    nisns: '',
-    hobbies: []
+    name: "",
+    phone: "",
+    nisns: "",
+    hobbies: [],
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (student) {
-      // Handle phone array - get first phone number
-      const phoneNumber = student.phone && student.phone.length > 0 
-        ? student.phone[0].number_phone 
-        : '';
+      console.log('Editing student data:', student); // Debug log
       
-      // Handle nisns array - get first NISN
-      const nisnNumber = student.nisns && student.nisns.length > 0 
-        ? student.nisns[0].nisns 
-        : '';
-      
-      // Handle hobbies array - get hobby IDs
-      const hobbyIds = student.hobbies && student.hobbies.length > 0 
-        ? student.hobbies.map(hobby => hobby.id)
-        : [];
+      const phoneNumbers =
+        student.phone && student.phone.length > 0
+          ? student.phone.map((p) => p.number_phone)
+          : [];
 
-      setFormData({
-        name: student.name || '',
-        phone: phoneNumber,
-        nisns: nisnNumber,
-        hobbies: hobbyIds
-      });
+      // Handle nisns array - get first NISN
+      const nisnNumber = student.nisns && student.nisns.length > 0 ? student.nisns.map(n => n.nisns) : [];
+
+      // Handle hobbies array - get hobby IDs
+      const hobbyIds =
+        student.hobbies && student.hobbies.length > 0
+          ? student.hobbies.map((hobby) => hobby.id)
+          : [];
+
+      const formDataToSet = {
+        name: student.name || "",
+        phone: phoneNumbers.length > 0 ? phoneNumbers[0] : "",
+        nisns: nisnNumber.length > 0 ? nisnNumber[0] : "",
+        hobbies: hobbyIds,
+      };
+
+      console.log('Setting form data:', formDataToSet); // Debug log
+      setFormData(formDataToSet);
     }
   }, [student]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let processedValue = value;
     
-    // Format phone number as user types
-    if (name === 'phone') {
-      processedValue = formatPhoneNumber(value);
-    }
-    
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: processedValue
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
   const handleHobbyChange = (hobbyId) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const currentHobbies = [...prev.hobbies];
       const index = currentHobbies.indexOf(hobbyId);
-      
+
       if (index > -1) {
         // Remove hobby if already selected
         currentHobbies.splice(index, 1);
@@ -74,10 +71,10 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
         // Add hobby if not selected
         currentHobbies.push(hobbyId);
       }
-      
+
       return {
         ...prev,
-        hobbies: currentHobbies
+        hobbies: currentHobbies,
       };
     });
   };
@@ -86,25 +83,25 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     } else if (formData.name.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
+      newErrors.name = "Name must be at least 2 characters long";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (formData.phone.replace(/\D/g, '').length < 10) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = "Phone number is required";
+    } else if (formData.phone.replace(/\D/g, "").length < 10) {
+      newErrors.phone = "Please enter a valid phone number (minimum 10 digits)";
     }
 
     if (!formData.nisns.trim()) {
-      newErrors.nisns = 'NISN is required';
+      newErrors.nisns = "NISN is required";
     } else if (formData.nisns.length < 5) {
-      newErrors.nisns = 'NISN must be at least 5 characters long';
+      newErrors.nisns = "NISN must be at least 5 characters long";
     }
 
     if (formData.hobbies.length === 0) {
-      newErrors.hobbies = 'Please select at least one hobby';
+      newErrors.hobbies = "Please select at least one hobby";
     }
 
     setErrors(newErrors);
@@ -113,23 +110,25 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
-    
+
     try {
       // Prepare data according to API structure
       const submitData = {
         name: formData.name.trim(),
         phone: formData.phone.trim(),
         nisns: formData.nisns.trim(),
-        hobbies: formData.hobbies
+        hobbies: formData.hobbies,
       };
-      
+
+      console.log('Submitting student data:', submitData); // Debug log
+
       await onSubmit(submitData);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     } finally {
       setIsLoading(false);
     }
@@ -148,12 +147,16 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
           value={formData.name}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-            errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            errors.name
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           }`}
           placeholder="Enter student name"
         />
         {errors.name && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {errors.name}
+          </p>
         )}
       </div>
 
@@ -168,12 +171,16 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
           value={formData.phone}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-            errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            errors.phone
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           }`}
-          placeholder="Enter phone number"
+          placeholder="Enter phone number (e.g., 08123456789)"
         />
         {errors.phone && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {errors.phone}
+          </p>
         )}
       </div>
 
@@ -188,12 +195,16 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
           value={formData.nisns}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-            errors.nisns ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            errors.nisns
+              ? "border-red-500"
+              : "border-gray-300 dark:border-gray-600"
           }`}
           placeholder="Enter NISN"
         />
         {errors.nisns && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nisns}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {errors.nisns}
+          </p>
         )}
       </div>
 
@@ -203,20 +214,27 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
           Hobbies *
         </label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {hobbies.map(hobby => (
-            <label key={hobby.id} className="flex items-center space-x-2 cursor-pointer">
+          {hobbies.map((hobby) => (
+            <label
+              key={hobby.id}
+              className="flex items-center space-x-2 cursor-pointer"
+            >
               <input
                 type="checkbox"
                 checked={formData.hobbies.includes(hobby.id)}
                 onChange={() => handleHobbyChange(hobby.id)}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{hobby.name}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                {hobby.name}
+              </span>
             </label>
           ))}
         </div>
         {errors.hobbies && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.hobbies}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {errors.hobbies}
+          </p>
         )}
       </div>
 
@@ -234,9 +252,9 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
           disabled={isLoading}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Saving...' : (student ? 'Update Student' : 'Add Student')}
+          {isLoading ? "Saving..." : student ? "Update Student" : "Add Student"}
         </button>
       </div>
     </form>
   );
-} 
+}

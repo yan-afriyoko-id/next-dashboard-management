@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 
 export default function HobbyForm({ hobby, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    difficulty: 'medium'
+    name: ''
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -15,10 +12,7 @@ export default function HobbyForm({ hobby, onSubmit, onCancel }) {
   useEffect(() => {
     if (hobby) {
       setFormData({
-        name: hobby.name || '',
-        description: hobby.description || '',
-        category: hobby.category || '',
-        difficulty: hobby.difficulty || 'medium'
+        name: hobby.name || ''
       });
     }
   }, [hobby]);
@@ -48,16 +42,6 @@ export default function HobbyForm({ hobby, onSubmit, onCancel }) {
       newErrors.name = 'Hobby name must be at least 2 characters long';
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (formData.description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters long';
-    }
-
-    if (!formData.category.trim()) {
-      newErrors.category = 'Category is required';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -76,28 +60,6 @@ export default function HobbyForm({ hobby, onSubmit, onCancel }) {
       setIsLoading(false);
     }
   };
-
-  const categories = [
-    'Sports',
-    'Arts & Crafts',
-    'Music',
-    'Technology',
-    'Reading',
-    'Cooking',
-    'Gaming',
-    'Outdoor Activities',
-    'Collecting',
-    'Photography',
-    'Writing',
-    'Dancing',
-    'Other'
-  ];
-
-  const difficulties = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'hard', label: 'Hard' }
-  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -121,80 +83,6 @@ export default function HobbyForm({ hobby, onSubmit, onCancel }) {
         {errors.name && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
             {errors.name}
-          </p>
-        )}
-      </div>
-
-      {/* Category */}
-      <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Category *
-        </label>
-        <select
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            errors.category ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-          }`}
-          disabled={isLoading}
-        >
-          <option value="">Select a category</option>
-          {categories.map(category => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        {errors.category && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.category}
-          </p>
-        )}
-      </div>
-
-      {/* Difficulty */}
-      <div>
-        <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Difficulty Level
-        </label>
-        <select
-          id="difficulty"
-          name="difficulty"
-          value={formData.difficulty}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
-          disabled={isLoading}
-        >
-          {difficulties.map(difficulty => (
-            <option key={difficulty.value} value={difficulty.value}>
-              {difficulty.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Description *
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          rows="4"
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 ${
-            errors.description ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-          }`}
-          placeholder="Describe the hobby in detail..."
-          disabled={isLoading}
-        />
-        {errors.description && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.description}
           </p>
         )}
       </div>
