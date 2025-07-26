@@ -32,8 +32,8 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
 
       const formDataToSet = {
         name: student.name || "",
-        phone: phoneNumbers.length > 0 ? phoneNumbers[0] : "",
-        nisns: nisnNumber.length > 0 ? nisnNumber[0] : "",
+        phone: phoneNumbers.length > 0 ? String(phoneNumbers[0]) : "",
+        nisns: nisnNumber.length > 0 ? String(nisnNumber[0]) : "",
         hobbies: hobbyIds,
       };
 
@@ -47,7 +47,7 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
     
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'phone' || name === 'nisns' ? String(value) : value,
     }));
 
     // Clear error when user starts typing
@@ -88,15 +88,19 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
       newErrors.name = "Name must be at least 2 characters long";
     }
 
-    if (!formData.phone.trim()) {
+    // Ensure phone is a string before validation
+    const phoneValue = typeof formData.phone === 'string' ? formData.phone : String(formData.phone || '');
+    if (!phoneValue.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (formData.phone.replace(/\D/g, "").length < 10) {
+    } else if (phoneValue.replace(/\D/g, "").length < 10) {
       newErrors.phone = "Please enter a valid phone number (minimum 10 digits)";
     }
 
-    if (!formData.nisns.trim()) {
+    // Ensure nisns is a string before validation
+    const nisnsValue = typeof formData.nisns === 'string' ? formData.nisns : String(formData.nisns || '');
+    if (!nisnsValue.trim()) {
       newErrors.nisns = "NISN is required";
-    } else if (formData.nisns.length < 5) {
+    } else if (nisnsValue.length < 5) {
       newErrors.nisns = "NISN must be at least 5 characters long";
     }
 
@@ -119,8 +123,8 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
       // Prepare data according to API structure
       const submitData = {
         name: formData.name.trim(),
-        phone: formData.phone.trim(),
-        nisns: formData.nisns.trim(),
+        phone: String(formData.phone || '').trim(),
+        nisns: String(formData.nisns || '').trim(),
         hobbies: formData.hobbies,
       };
 
@@ -257,4 +261,4 @@ export default function StudentForm({ student, hobbies, onSubmit, onCancel }) {
       </div>
     </form>
   );
-}
+} 

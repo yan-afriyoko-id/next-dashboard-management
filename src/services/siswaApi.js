@@ -36,7 +36,45 @@ class SiswaApiService {
         headers: getAuthHeaders(token),
         body: JSON.stringify(formattedData)
       });
-      return await response.json();
+      
+      const result = await response.json();
+      
+      // Handle specific error cases
+      if (!result.success) {
+        // Check for unique constraint violations
+        if (result.errors) {
+          const errorMessages = [];
+          
+          if (result.errors.phone) {
+            errorMessages.push(`Phone number "${formattedData.phone}" is already taken by another student`);
+          }
+          
+          if (result.errors.nisns) {
+            errorMessages.push(`NISN "${formattedData.nisns}" is already taken by another student`);
+          }
+          
+          if (result.errors.name) {
+            errorMessages.push(result.errors.name.join(', '));
+          }
+          
+          if (result.errors.hobbies) {
+            errorMessages.push(result.errors.hobbies.join(', '));
+          }
+          
+          if (errorMessages.length > 0) {
+            throw new Error(errorMessages.join('. '));
+          }
+        }
+        
+        // Handle general error message
+        if (result.message) {
+          throw new Error(result.message);
+        }
+        
+        throw new Error('Failed to create student');
+      }
+      
+      return result;
     } catch (error) {
       throw new Error('Failed to create student: ' + error.message);
     }
@@ -53,7 +91,45 @@ class SiswaApiService {
         headers: getAuthHeaders(token),
         body: JSON.stringify(formattedData)
       });
-      return await response.json();
+      
+      const result = await response.json();
+      
+      // Handle specific error cases
+      if (!result.success) {
+        // Check for unique constraint violations
+        if (result.errors) {
+          const errorMessages = [];
+          
+          if (result.errors.phone) {
+            errorMessages.push(`Phone number "${formattedData.phone}" is already taken by another student`);
+          }
+          
+          if (result.errors.nisns) {
+            errorMessages.push(`NISN "${formattedData.nisns}" is already taken by another student`);
+          }
+          
+          if (result.errors.name) {
+            errorMessages.push(result.errors.name.join(', '));
+          }
+          
+          if (result.errors.hobbies) {
+            errorMessages.push(result.errors.hobbies.join(', '));
+          }
+          
+          if (errorMessages.length > 0) {
+            throw new Error(errorMessages.join('. '));
+          }
+        }
+        
+        // Handle general error message
+        if (result.message) {
+          throw new Error(result.message);
+        }
+        
+        throw new Error('Failed to update student');
+      }
+      
+      return result;
     } catch (error) {
       throw new Error('Failed to update student: ' + error.message);
     }
